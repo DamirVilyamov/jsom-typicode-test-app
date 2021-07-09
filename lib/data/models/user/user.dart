@@ -39,6 +39,18 @@ class User {
     );
   }
 
+
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'name': name,
+    'username': username,
+    'email': email,
+    'address': address.toJson(),
+    'phone': phone,
+    'website': website,
+    'company': company.toJson(),
+  };
+
   @override
   String toString() {
     return "id: ${this.id} username: ${this.username} ${this.address} ${this.company}";

@@ -3,8 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:json_typicode_test_app/bloc/albums/albums_cubit.dart';
 import 'package:json_typicode_test_app/bloc/albums/albums_state.dart';
-import 'package:json_typicode_test_app/bloc/photos/photos_cubit.dart';
-import 'package:json_typicode_test_app/bloc/photos/photos_state.dart';
 import 'package:json_typicode_test_app/bloc/posts/user_posts_cubit.dart';
 import 'package:json_typicode_test_app/bloc/posts/user_posts_state.dart';
 import 'package:json_typicode_test_app/data/models/user/user.dart';
@@ -17,8 +15,10 @@ class UserInfoScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final user = ModalRoute.of(context).settings.arguments as User;
+
     final postsBloc = context.bloc<UserPostsCubit>();
     postsBloc.getPosts(user.id.toString());
+
     final albumsBloc = context.bloc<UserAlbumsCubit>();
     albumsBloc.getAlbums(user.id.toString());
 
@@ -112,6 +112,7 @@ class UserInfoScreen extends StatelessWidget {
                 ),
               ),
               buildPostsPreview(context),
+              buildAlbumsPreview(context),
             ],
             crossAxisAlignment: CrossAxisAlignment.start,
           ),
@@ -124,11 +125,35 @@ class UserInfoScreen extends StatelessWidget {
     return BlocBuilder<UserPostsCubit, UserPostsState>(
       builder: (ctx, state) {
         List<Widget> postItems = [];
-        state.posts.take(3).toList().forEach((element) {
+        state.posts.take(3).toList().forEach((post) {
           postItems.add(
-            ListTile(
-              title: Text(element.title),
-              subtitle: Text('post title'),
+            Card(
+              margin: EdgeInsets.symmetric(vertical: 8),
+              child: Container(
+                margin: EdgeInsets.all(8),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      child: Text(
+                        post.title,
+                        style: TextStyle(fontSize: 20),
+                      ),
+                      margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                    ),
+                    Container(
+                      child: Text(
+                        post.body,
+                        maxLines: 1,
+                        style: TextStyle(
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                    ),
+                  ],
+                ),
+              ),
             ),
           );
         });
@@ -156,45 +181,60 @@ class UserInfoScreen extends StatelessWidget {
 
   Widget buildAlbumsPreview(BuildContext context) {
     return BlocBuilder<UserAlbumsCubit, UserAlbumsState>(
-      builder: (ctx, state) {
-        return BlocBuilder<AlbumPhotosCubit, AlbumPhotosState>(builder: (_, photosState) {
-          List<Widget> albumItems = [];
-          state.albums.take(3).toList().forEach((element) {
-            albumItems.add(Card(
+      builder: (ctx, albumsState) {
+        List<Widget> albumItems = [];
+
+        albumsState.albums.take(3).toList().forEach((album) {
+          albumItems.add(
+            Card(
+              margin: EdgeInsets.symmetric(vertical: 8),
               child: Container(
+                margin: EdgeInsets.all(8),
                 height: 120,
                 child: Row(
                   children: [
-                   /* Expanded(flex: 30, child: Image.network(src)),*/
                     Expanded(
+                        flex: 30,
+                        child: Image.network(
+                          album.photos.first.thumbnailUrl,
+                          fit: BoxFit.fill,
+                        )),
+                    Expanded(
+                      flex: 70,
                       child: Column(
-                        children: [],
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Container(
+                            child: Text(album.title),
+                            margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                          ),
+                        ],
                       ),
                     ),
                   ],
                 ),
               ),
-            ));
-          });
-          if (state.albums.isNotEmpty) {
-            albumItems.add(Container(
-              margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-              child: GestureDetector(
-                onTap: () {
-                  Navigator.pushNamed(context, AlbumsScreen.ROUTE_NAME);
-                },
-                child: Text(
-                  'See all',
-                  style: TextStyle(fontSize: 16, color: Colors.blueAccent),
-                ),
-              ),
-            ));
-          }
-          return Column(
-            children: albumItems,
-            crossAxisAlignment: CrossAxisAlignment.center,
+            ),
           );
         });
+        if (albumsState.albums.isNotEmpty) {
+          albumItems.add(Container(
+            margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+            child: GestureDetector(
+              onTap: () {
+                Navigator.pushNamed(context, AlbumsScreen.ROUTE_NAME);
+              },
+              child: Text(
+                'See all',
+                style: TextStyle(fontSize: 16, color: Colors.blueAccent),
+              ),
+            ),
+          ));
+        }
+        return Column(
+          children: albumItems,
+          crossAxisAlignment: CrossAxisAlignment.center,
+        );
       },
     );
   }

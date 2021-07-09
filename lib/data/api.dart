@@ -20,21 +20,25 @@ class Api {
   }
 
   Future<String> fetchAllUsers() async {
+    print('!@# get users from network');
     final response = await http.get(Uri.parse(ApiRoutes.ALL_USERS));
     return checkResponseForSuccess(response);
   }
 
   Future<String> fetchUserPosts(String userId) async {
+    print('!@# get posts from network');
     final response = await http.get(Uri.parse(ApiRoutes.USER_POSTS(userId)));
     return checkResponseForSuccess(response);
   }
 
   Future<String> fetchUserAlbums(String userId) async {
+    print('!@# get albums from network');
     final response = await http.get(Uri.parse(ApiRoutes.USER_ALBUMS(userId)));
     return checkResponseForSuccess(response);
   }
 
   Future<String> fetchAlbumPhotos(String albumId) async {
+    print('!@# get albums from network');
     final response = await http.get(Uri.parse(ApiRoutes.ALBUM_PHOTOS(albumId)));
     return checkResponseForSuccess(response);
   }

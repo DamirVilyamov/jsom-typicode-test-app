@@ -8,15 +8,33 @@ class PostDetailsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final post = ModalRoute.of(context).settings.arguments as Post;
     return Scaffold(
-        appBar: AppBar(
-          centerTitle: true,
-          title: Text("Post Details"),
-        ),
-        body: Column(
+      appBar: AppBar(
+        centerTitle: true,
+        title: Text("Post Details"),
+      ),
+      body: Container(
+        width: double.infinity,
+        child: Column(
           children: [
-            Text(post.title),
-            Text(post.body),
+            Container(
+              margin: EdgeInsets.symmetric(vertical: 16, horizontal: 32),
+              child: Text(
+                post.title,
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 20),
+              ),
+            ),
+            Container(
+              margin: EdgeInsets.symmetric(horizontal: 16),
+              child: Text(
+                post.body,
+                style: TextStyle(fontSize: 16),
+              ),
+            ),
           ],
-        ));
+          crossAxisAlignment: CrossAxisAlignment.start,
+        ),
+      ),
+    );
   }
 }

@@ -17,6 +17,12 @@ class Company {
     );
   }
 
+  Map<String, dynamic> toJson() => {
+        'name': name,
+        'catchPhrase': catchPhrase,
+        'bs': bs,
+      };
+
   @override
   String toString() {
     return "company name: ${this.name} bs: ${this.bs}";

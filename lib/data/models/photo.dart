@@ -23,8 +23,16 @@ class Photo {
     );
   }
 
+  Map<String, dynamic> toJson() => {
+        'albumId': albumId,
+        'id': id,
+        'title': title,
+        'url': url,
+        'thumbnailUrl': thumbnailUrl,
+      };
+
   @override
   String toString() {
-    return "Photo ${this.id} ${this.title}";
+    return "Photo ${this.id} ${this.title} ${this.albumId}";
   }
 }

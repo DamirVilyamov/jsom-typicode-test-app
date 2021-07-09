@@ -14,6 +14,11 @@ class Geo {
     );
   }
 
+  Map<String, dynamic> toJson() => {
+        'lat': lat,
+        'lng': lng,
+      };
+
   @override
   String toString() {
     return "lat: ${this.lat} ${this.lng}";

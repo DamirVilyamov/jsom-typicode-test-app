@@ -27,6 +27,14 @@ class Address {
     );
   }
 
+  Map<String, dynamic> toJson() => {
+        'street': street,
+        'suite': suite,
+        'city': city,
+        'zipcode': zipcode,
+        'geo': geo.toJson(),
+      };
+
   @override
   String toString() {
     return "${this.street} ${this.geo}";
