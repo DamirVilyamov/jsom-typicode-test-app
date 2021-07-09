@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:json_typicode_test_app/data/models/album.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'models/comment.dart';
 import 'models/photo.dart';
 import 'models/post.dart';
 import 'models/user/user.dart';
@@ -24,8 +25,11 @@ class SharedPrefs {
     return "user/$userId/posts/${post.id}";
   }
 
+  String _getCommentKey(String postId, String commentId) {
+    return "post/$postId/comments/$commentId";
+  }
+
   void saveUsers(List<User> users) async {
-    print('!@# save users to cache');
     SharedPreferences prefs = await SharedPreferences.getInstance();
 
     for (var user in users) {
@@ -35,7 +39,6 @@ class SharedPrefs {
   }
 
   Future<List<User>> getUsers() async {
-    print('!@# get users from cache');
     SharedPreferences prefs = await SharedPreferences.getInstance();
 
     List<String> userKeys = [];
@@ -55,12 +58,11 @@ class SharedPrefs {
 
       users.add(user);
     }
-    print('!@# users ' + users.toString());
+
     return users;
   }
 
   void saveUserPosts(List<Post> posts, String userId) async {
-    print('!@# save posts to cache');
     SharedPreferences prefs = await SharedPreferences.getInstance();
 
     for (var post in posts) {
@@ -70,7 +72,6 @@ class SharedPrefs {
   }
 
   Future<List<Post>> getUserPosts(String userId) async {
-    print('!@# get posts from cache');
     SharedPreferences prefs = await SharedPreferences.getInstance();
 
     List<String> postKeys = [];
@@ -81,25 +82,19 @@ class SharedPrefs {
       }
     });
 
-    print("!@# post keys " + postKeys.toString());
     for (var key in postKeys) {
       final rawJson = prefs.getString(key);
-      print('!@# rawJson ' + rawJson);
 
       final json = jsonDecode(rawJson);
-      print('!@# json ' + json.toString());
 
       final post = Post.fromJson(json);
-      print('!@# post ' + post.toString());
 
       posts.add(post);
-      print('!@# post ' + posts.toString());
     }
     return posts;
   }
 
   void saveUserAlbums(List<Album> albums, String userId) async {
-    print('!@# save albums to cache');
     SharedPreferences prefs = await SharedPreferences.getInstance();
 
     for (var album in albums) {
@@ -110,7 +105,6 @@ class SharedPrefs {
   }
 
   Future<List<Album>> getUserAlbums(String userId) async {
-    print('!@# get albums from cache');
     SharedPreferences prefs = await SharedPreferences.getInstance();
 
     List<String> albumKeys = [];
@@ -121,26 +115,21 @@ class SharedPrefs {
       }
     });
 
-    print("!@# album keys " + albumKeys.toString());
     for (var key in albumKeys) {
       final rawJson = prefs.getString(key);
-      print('!@# rawJson ' + rawJson);
 
       final json = jsonDecode(rawJson);
-      print('!@# json ' + json.toString());
 
       final album = Album.fromJson(json);
-      print('!@# album ' + album.toString());
 
       album.photos = await getAlbumPhotos(album.id.toString());
       albums.add(album);
     }
-    print('!@# albums ' + albums.toString());
+
     return albums;
   }
 
   void saveAlbumPhotos(List<Photo> photos, String albumId) async {
-    print('!@# save photos to cache');
     SharedPreferences prefs = await SharedPreferences.getInstance();
 
     for (var photo in photos) {
@@ -150,7 +139,6 @@ class SharedPrefs {
   }
 
   Future<List<Photo>> getAlbumPhotos(String albumId) async {
-    print('!@# get photos from cache');
     SharedPreferences prefs = await SharedPreferences.getInstance();
 
     List<String> photoKeys = [];
@@ -161,20 +149,53 @@ class SharedPrefs {
       }
     });
 
-    print("!@# photo keys " + photoKeys.toString());
     for (var key in photoKeys) {
       final rawJson = prefs.getString(key);
-      print('!@# rawJson ' + rawJson);
 
       final json = jsonDecode(rawJson);
-      print('!@# json ' + json.toString());
 
       final photo = Photo.fromJson(json);
-      print('!@# photo ' + photo.toString());
 
       photos.add(photo);
     }
-    print('!@# photos ' + photos.toString());
+
     return photos;
+  }
+
+  void savePostComments(List<Comment> comments) async {
+    for (var comment in comments) {
+      saveComment(comment);
+    }
+  }
+
+  void saveComment(Comment comment) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    final value = jsonEncode(comment.toJson());
+    prefs.setString(_getCommentKey(comment.postId.toString(), comment.id.toString()), value);
+  }
+
+  Future<List<Comment>> getPostComments(String postId) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    List<String> commentKeys = [];
+    List<Comment> comments = [];
+    prefs.getKeys().forEach((element) {
+      if (element.startsWith('post/$postId/comments/')) {
+        commentKeys.add(element);
+      }
+    });
+
+    for (var key in commentKeys) {
+      final rawJson = prefs.getString(key);
+
+      final json = jsonDecode(rawJson);
+
+      final comment = Comment.fromJson(json);
+
+      comments.add(comment);
+    }
+
+    return comments;
   }
 }

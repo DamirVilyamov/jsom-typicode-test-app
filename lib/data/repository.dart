@@ -6,6 +6,7 @@ import 'package:json_typicode_test_app/data/models/photo.dart';
 import 'package:json_typicode_test_app/data/models/post.dart';
 import 'package:json_typicode_test_app/data/shared_preferences.dart';
 
+import 'models/comment.dart';
 import 'models/user/user.dart';
 
 class Repository {
@@ -74,5 +75,26 @@ class Repository {
     final photosJsonObjects = List.from(jsonDecode(json));
     List<Photo> photos = photosJsonObjects.map((e) => Photo.fromJson(e)).toList();
     return photos;
+  }
+
+  Future<List<Comment>> getPostComments(String postId) async {
+    List<Comment> comments = [];
+    final cachedComments = await prefs.getPostComments(postId);
+
+    if (cachedComments.isNotEmpty) {
+      comments = cachedComments;
+    } else {
+      final json = await _api.fetchPostComments(postId);
+      final commentJsonObjects = List.from(jsonDecode(json));
+      comments = commentJsonObjects.map((e) => Comment.fromJson(e)).toList();
+      prefs.savePostComments(comments);
+    }
+
+    return comments;
+  }
+
+  Future<void> savePostComment(Comment comment) async{
+    prefs.saveComment(comment);
+    await _api.sendPostComment(comment);
   }
 }

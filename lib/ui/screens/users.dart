@@ -9,7 +9,6 @@ import 'package:json_typicode_test_app/ui/screens/user_info.dart';
 class UsersScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    print('!@# users page build called');
     final bloc = context.bloc<UsersCubit>();
     bloc.getUsers();
 
