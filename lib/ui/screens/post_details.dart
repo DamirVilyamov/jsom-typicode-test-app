@@ -140,6 +140,7 @@ class PostDetailsScreen extends StatelessWidget {
                     id: id,
                     postId: post.id,
                   ));
+                  Navigator.pop(context);
                 },
                 child: Text('Submit')),
             SizedBox(
